@@ -18,28 +18,21 @@ class OrderController extends Controller
 {
     $validated = $request->validate([
         'order_type' => 'required|in:catalog,custom',
-        'product_id' => 'required_if:order_type,catalog|nullable|exists:products,id',
-        'custom_description' => 'required_if:order_type,custom|nullable|string',
+        'product_id' => 'nullable|exists:products,id',
+        'custom_description' => 'nullable|string',
         'custom_image' => 'nullable|image|max:2048',
         'quantity' => 'required|integer|min:1',
         'customer_name' => 'required|string|max:255',
-        'customer_contact' => 'required|string|max:50',
+        'contact_preference' => 'required|in:wa,email',
+        'customer_contact' => [
+            'required',
+            function ($attribute, $value, $fail) use ($request) {
+                if ($request->contact_preference === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    $fail('Masukkan alamat email yang valid.');
+                }
+            },
+        ],
         'notes' => 'nullable|string',
-    ], [
-        'order_type.required' => 'Jenis pesanan wajib dipilih.',
-        'order_type.in' => 'Jenis pesanan tidak valid.',
-        'product_id.required_if' => 'Produk wajib dipilih untuk pesanan katalog.',
-        'product_id.exists' => 'Produk yang dipilih tidak ditemukan.',
-        'custom_description.required_if' => 'Deskripsi custom wajib diisi.',
-        'custom_image.image' => 'File yang diunggah harus berupa gambar.',
-        'custom_image.max' => 'Ukuran gambar maksimal 2MB.',
-        'quantity.required' => 'Jumlah pesanan wajib diisi.',
-        'quantity.integer' => 'Jumlah harus berupa angka.',
-        'quantity.min' => 'Jumlah minimal 1.',
-        'customer_name.required' => 'Nama pemesan wajib diisi.',
-        'customer_name.max' => 'Nama maksimal 255 karakter.',
-        'customer_contact.required' => 'Kontak wajib diisi.',
-        'customer_contact.max' => 'Kontak maksimal 50 karakter.',
     ]);
 
     if ($request->hasFile('custom_image')) {
@@ -47,8 +40,28 @@ class OrderController extends Controller
         $validated['custom_image'] = $path;
     }
 
-    Order::create($validated);
+    $order = Order::create($validated);
 
-    return redirect()->route('order.index')->with('success', 'Pesanan berhasil dikirim! Admin akan segera menghubungi Anda.');
+    if ($order->contact_preference === 'wa') {
+        $productName = $order->order_type === 'catalog'
+            ? optional($order->product)->name
+            : 'Custom - ' . $order->custom_description;
+
+        $message = "Halo Admin TRX Atribut, saya ingin konfirmasi pesanan:\n\n"
+            . "Produk: {$productName}\n"
+            . "Jumlah: {$order->quantity} pcs\n"
+            . "Nama: {$order->customer_name}\n"
+            . "Kontak: {$order->customer_contact}\n"
+            . ($order->notes ? "Catatan: {$order->notes}\n" : '');
+
+        $waLink = 'https://wa.me/' . config('services.admin.whatsapp') . '?text=' . urlencode($message);
+
+        return redirect()->route('order.index')
+            ->with('success', 'Pesanan berhasil dikirim! Klik tombol di bawah untuk konfirmasi via WhatsApp.')
+            ->with('wa_link', $waLink);
+    }
+
+    return redirect()->route('order.index')
+        ->with('success', 'Pesanan berhasil dikirim! Admin akan menghubungi Anda melalui email dalam 1x24 jam.');
 }
 }

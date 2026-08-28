@@ -32,7 +32,15 @@
     <h1>Pemesanan Badge</h1>
 
     @if (session('success'))
-        <div class="alert-success">{{ session('success') }}</div>
+    <div class="alert-success">
+        {{ session('success') }}
+        @if (session('wa_link'))
+            <br><br>
+            <a href="{{ session('wa_link') }}" target="_blank" style="display:inline-block; background:#25D366; color:white; padding:10px 20px; border-radius:6px; text-decoration:none; font-weight:bold;">
+                📱 Konfirmasi via WhatsApp
+            </a>
+        @endif
+    </div>
     @endif
 
     <h2>Katalog Produk</h2>
@@ -90,8 +98,15 @@
             <input type="text" name="customer_name">
             @error('customer_name') <div class="error">{{ $message }}</div> @enderror
 
-            <label>Kontak (No. HP / WhatsApp)</label>
-            <input type="text" name="customer_contact">
+            <label>Ingin Dihubungi Balik Melalui</label>
+            <select name="contact_preference" id="contact_preference">
+                <option value="wa">WhatsApp</option>
+                <option value="email">Email</option>
+            </select>
+            @error('contact_preference') <div class="error">{{ $message }}</div> @enderror
+
+            <label id="contact_label">Nomor WhatsApp</label>
+            <input type="text" name="customer_contact" id="customer_contact" placeholder="08xxxxxxxxxx">
             @error('customer_contact') <div class="error">{{ $message }}</div> @enderror
 
             <label>Catatan Tambahan (opsional)</label>
@@ -99,9 +114,10 @@
             @error('notes') <div class="error">{{ $message }}</div> @enderror
 
             <div id="nego-box" style="display:none; background:#fff3cd; padding:12px; border-radius:6px; margin-top:16px;">
-    <p style="margin:0 0 8px;">Jumlah pesanan Anda memenuhi syarat nego harga. Hubungi admin untuk penawaran khusus:</p>
-    <a href="https://wa.me/6287724037964" target="_blank" style="color:#2b6cb0; font-weight:bold;">Hubungi Admin via WhatsApp</a>
-</div>
+                <p style="margin:0 0 8px;">Jumlah pesanan Anda memenuhi syarat nego harga. Hubungi admin untuk penawaran khusus:</p>
+                <a href="https://wa.me/6287724037964" target="_blank" style="color:#2b6cb0; font-weight:bold;">Hubungi Admin via WhatsApp</a>
+            </div>
+
             <button type="submit">Kirim Pesanan</button>
         </form>
     </div>
@@ -115,6 +131,9 @@
     const productSelect = document.querySelector('select[name="product_id"]');
     const quantityInput = document.querySelector('input[name="quantity"]');
     const negoBox = document.getElementById('nego-box');
+    const contactPref = document.getElementById('contact_preference');
+    const contactLabel = document.getElementById('contact_label');
+    const contactInput = document.getElementById('customer_contact');
 
     function toggleFields() {
         if (orderType.value === 'custom') {
@@ -145,11 +164,26 @@
         }
     }
 
+    function toggleContactField() {
+        if (contactPref.value === 'email') {
+            contactLabel.textContent = 'Alamat Email';
+            contactInput.type = 'email';
+            contactInput.placeholder = 'nama@email.com';
+        } else {
+            contactLabel.textContent = 'Nomor WhatsApp';
+            contactInput.type = 'text';
+            contactInput.placeholder = '08xxxxxxxxxx';
+        }
+    }
+
     orderType.addEventListener('change', toggleFields);
     productSelect.addEventListener('change', checkNego);
     quantityInput.addEventListener('input', checkNego);
+    contactPref.addEventListener('change', toggleContactField);
+
     toggleFields();
-</script>
+    toggleContactField();
+    </script>
 
 </body>
 </html>
