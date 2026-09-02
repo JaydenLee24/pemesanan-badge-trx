@@ -21,7 +21,7 @@ class OrderController extends Controller
         'order_type' => 'required|in:catalog,custom',
         'product_id' => 'required_if:order_type,catalog|nullable|exists:products,id',
         'custom_description' => 'required_if:order_type,custom|nullable|string',
-        'custom_image' => 'nullable|mimes:jpg,jpeg,png,webp,heic,heif|max:5120',
+        'custom_image' => 'nullable|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
         'quantity' => 'required|integer|min:1',
         'customer_name' => 'required|string|max:255',
         'contact_preference' => 'required|in:wa,email',
@@ -50,7 +50,7 @@ class OrderController extends Controller
         'contact_preference.required' => 'Preferensi kontak wajib dipilih.',
         'customer_contact.required' => 'Kontak wajib diisi.',
         'custom_image.mimes' => 'Format gambar harus JPG, PNG, WEBP, atau HEIC.',
-        'custom_image.max' => 'Ukuran gambar maksimal 5MB.',
+        'custom_image.max' => 'Ukuran gambar maksimal 10MB.',
     ]);
 
     // Auto-koreksi: cross-check isi kontak vs pilihan dropdown, biar data selalu konsisten

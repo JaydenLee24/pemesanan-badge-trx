@@ -96,7 +96,7 @@
                 <textarea name="custom_description" rows="3" placeholder="Jelaskan desain, warna, ukuran badge yang diinginkan"></textarea>
                 @error('custom_description') <div class="error">{{ $message }}</div> @enderror
 
-                <label>Upload Gambar Referensi (opsional, max 5MB (BELUM FIX))</label>
+                <label>Upload Gambar Referensi (opsional, max 10MB)</label>
                 <input type="file" name="custom_image" accept="image/*">
                 @error('custom_image') <div class="error">{{ $message }}</div> @enderror
             </div>
