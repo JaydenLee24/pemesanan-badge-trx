@@ -31,6 +31,17 @@
 
     <h1>Pemesanan Badge</h1>
 
+    @if ($errors->any())
+<div style="background:#f8d7da; color:#721c24; padding:14px; border-radius:6px; margin-bottom:20px;">
+    <strong>Pesanan gagal dikirim, mohon periksa kembali:</strong>
+    <ul style="margin:8px 0 0; padding-left:20px;">
+        @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
     @if (session('success'))
     <div class="alert-success">
         {{ session('success') }}
@@ -85,7 +96,7 @@
                 <textarea name="custom_description" rows="3" placeholder="Jelaskan desain, warna, ukuran badge yang diinginkan"></textarea>
                 @error('custom_description') <div class="error">{{ $message }}</div> @enderror
 
-                <label>Upload Gambar Referensi (opsional, max 2MB)</label>
+                <label>Upload Gambar Referensi (opsional, max 5MB (BELUM FIX))</label>
                 <input type="file" name="custom_image" accept="image/*">
                 @error('custom_image') <div class="error">{{ $message }}</div> @enderror
             </div>
