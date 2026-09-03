@@ -41,7 +41,7 @@ class OrderController extends Controller
         'product_id.exists' => 'Produk yang dipilih tidak ditemukan.',
         'custom_description.required_if' => 'Deskripsi custom wajib diisi.',
         'custom_image.image' => 'File yang diunggah harus berupa gambar.',
-        'custom_image.max' => 'Ukuran gambar maksimal 5MB.',
+        'custom_image.max' => 'Ukuran gambar maksimal 10MB.',
         'quantity.required' => 'Jumlah pesanan wajib diisi.',
         'quantity.integer' => 'Jumlah harus berupa angka.',
         'quantity.min' => 'Jumlah minimal 1.',
